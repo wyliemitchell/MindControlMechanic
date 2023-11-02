@@ -6,10 +6,15 @@ using UnityEngine.InputSystem;
 // Takes and handles input and movement for a player character
 public class PlayerController : MonoBehaviour
 {
+    public bool isHiding = false;
+    private bool isInHidingSpotArea = false;
+
     public float moveSpeed = 1f;
     public float collisionOffset = 0.05f;
     public ContactFilter2D movementFilter;
     public SwordAttack swordAttack;
+
+    private InputAction hideAction;
 
     Vector2 movementInput;
     SpriteRenderer spriteRenderer;
@@ -25,6 +30,7 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        hideAction = GetComponent<PlayerInput>().actions["Hide"];
     }
 
     private void FixedUpdate() {
@@ -54,6 +60,44 @@ public class PlayerController : MonoBehaviour
                 spriteRenderer.flipX = false;
             }
         }
+
+        CheckPlayerHidden();
+    }
+
+    private void CheckPlayerHidden()
+    {
+        if (hideAction.IsPressed()) {
+            Debug.Log("Pressing Hide");
+            if (isInHidingSpotArea) {
+                HidePlayer();
+            }
+            else {
+                UnhidePlayer();
+            }
+        }
+        else {
+            UnhidePlayer();
+        }
+    }
+
+    private void HidePlayer() {
+        if (isHiding == false) {
+            Color hidingColor = new Color(1f, 1f, 1f, 0.5f);
+
+            GetComponent<SpriteRenderer>().color = hidingColor;
+            Debug.Log("Do this the first time you hide!");
+        }
+        isHiding = true;
+    }
+
+    private void UnhidePlayer() {
+        if (isHiding == true) {
+            Color normalColor = new Color(1f, 1f, 1f, 1f);
+
+            GetComponent<SpriteRenderer>().color = normalColor;
+        }
+        Debug.Log("Is not hiding!");
+        isHiding = false;
     }
 
     private bool TryMove(Vector2 direction) {
@@ -107,5 +151,25 @@ public class PlayerController : MonoBehaviour
 
     public void UnlockMovement() {
         canMove = true;
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision) {
+        if(collision.tag == "HidingSpot") {
+            isInHidingSpotArea = true;
+        } else if (collision.tag == "Enemy")
+        {
+            if(isHiding == false)
+            {
+                //Deal Damage to Player!
+            }
+        }
+    }
+
+    public void OnTriggerExit2D(Collider2D collision)
+    {
+        if(collision.tag == "HidingSpot") {
+            isInHidingSpotArea = false;
+            UnhidePlayer();
+        }
     }
 }
