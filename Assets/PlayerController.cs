@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public enum CharacterAllegiance
+{
+    Player,
+    Friendly,
+    TempFriendly, //Mind Control
+    Hostile
+}
+
 // Takes and handles input and movement for a player character
 public class PlayerController : MonoBehaviour
 {
@@ -13,6 +21,8 @@ public class PlayerController : MonoBehaviour
     public float collisionOffset = 0.05f;
     public ContactFilter2D movementFilter;
     public SwordAttack swordAttack;
+
+    public const CharacterAllegiance characterAllegiance = CharacterAllegiance.Player;
 
     private InputAction hideAction;
 
@@ -31,6 +41,13 @@ public class PlayerController : MonoBehaviour
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         hideAction = GetComponent<PlayerInput>().actions["Hide"];
+
+        for (int i = 0; i < 5; i++)
+        {
+            Debug.Log(i);
+        }
+
+
     }
 
     private void FixedUpdate() {
@@ -171,5 +188,13 @@ public class PlayerController : MonoBehaviour
             isInHidingSpotArea = false;
             UnhidePlayer();
         }
+    }
+
+    public void MindControlEnemy()
+    {
+        //Do all the logic for mind controlling an enemy (probably an enum for a channel time, etc.)
+
+        EnemyController enemyBeingMindControlled;
+
     }
 }

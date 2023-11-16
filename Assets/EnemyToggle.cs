@@ -14,22 +14,40 @@ public class TurnEnemyFriendly : MonoBehaviour
         {
             StartCoroutine(ChannelNearestEnemy());
         }
+        
+        
     }
 
     IEnumerator ChannelNearestEnemy()
     {
         isChanneling = true;
 
-        Collider[] hitColliders = Physics.OverlapSphere(transform.position, friendlyRadius);
+        Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, friendlyRadius);
+            //Physics.OverlapSphere(transform.position, friendlyRadius);
 
         Enemy nearestEnemy = null;
         float nearestDistance = float.MaxValue;
 
-        foreach (var collider in hitColliders)
+
+        for(int i = 0; i < hitColliders.Length; i++)
+        {
+            if (hitColliders[i].CompareTag("Enemy"))
+            {
+                //Do stuff because this is an enemy.
+            }
+        }
+
+        
+        foreach (Collider2D collider in hitColliders)
         {
             if (collider.CompareTag("Enemy"))
             {
                 Enemy enemyScript = collider.GetComponent<Enemy>();
+                /*
+                if(enemyScript.enemyType == EnemyType.Basic)
+                {
+
+                }
 
                 if (enemyScript != null)
                 {
@@ -54,9 +72,11 @@ public class TurnEnemyFriendly : MonoBehaviour
                         Debug.LogWarning("No channeling time specified for enemy type: " + enemyType);
                     }
                 }
+                */
             }
         }
-
+        
+        yield return null;
         if (nearestEnemy != null)
         {
             nearestEnemy.ToggleFriendlyState();

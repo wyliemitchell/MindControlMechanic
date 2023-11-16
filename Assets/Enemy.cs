@@ -2,9 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 public class Enemy : MonoBehaviour
 {
     Animator animator;
+
+    //public int enemyType = 1; //0 = Minion, 1 = Basic, 2 = Elite, 3 = Miniboss, 4 = Boss
+
 
      public float Health {
         set {
@@ -64,6 +69,8 @@ public class Enemy : MonoBehaviour
         }
     }
 
+
+    
 }
 
 
