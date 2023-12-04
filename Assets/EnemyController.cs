@@ -7,11 +7,14 @@ public enum EnemyType
     Basic,
     Elite,
     Miniboss,
-    Boss
+    Boss,
+    Trash
 }
 
 public class EnemyController : MonoBehaviour
 {
+    //public Dictionary<EnemyType, float> enemyDropRates = new Dictionary<EnemyType, float>(); // Dictionaries!
+
     public float moveSpeed = 5f;
     public Transform player;
 
@@ -26,6 +29,22 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        /* //Dictionaries!
+        enemyDropRates.Add(EnemyType.Minion, .15f);
+        enemyDropRates.Add(EnemyType.Basic, .25f);
+        enemyDropRates.Add(EnemyType.Elite, .5f);
+        enemyDropRates.Add(EnemyType.Miniboss, .75f);
+        enemyDropRates.Add(EnemyType.Boss, 1f);
+
+        //Debug.Log(enemyDropRates.GetValueOrDefault(EnemyType.Elite));
+
+        float DropRate;
+
+        if(enemyDropRates.TryGetValue(EnemyType.Miniboss, out DropRate))
+        {
+            Debug.Log(DropRate);
+        }*/
     }
 
     void Update()
@@ -36,13 +55,9 @@ public class EnemyController : MonoBehaviour
 
     void CalculateTarget()
     {
-        Vector2 thisObject = new Vector2(this.transform.position.x, this.transform.position.y);
-
         if (characterAllegiance == CharacterAllegiance.Hostile)
         {
-            Vector2 playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
-
-            if(Vector3.Distance(thisObject, playerPos) < aggroRadius)
+            if(Vector3.Distance(this.transform.position, player.transform.position) < aggroRadius)
             {
                 target = player;
             }
@@ -63,23 +78,25 @@ public class EnemyController : MonoBehaviour
                 {
                     if(hitColliders[i].CompareTag("Enemy"))
                     {
-                        Transform enemy = hitColliders[i].transform;
+                        if (this.gameObject != hitColliders[i].gameObject)
+                        {
+                            Transform enemy = hitColliders[i].transform;
 
-                        enemies.Add(enemy);
+                            enemies.Add(enemy);
+                        }
                     }
                 }
 
                 float shortestDistance = aggroRadius + 1;
                 Transform currentTarget = null;
-                
 
                 for (int i=0; i< enemies.Count; i++)
                 {
                     Vector2 enemyLocation = new Vector2(enemies[i].transform.position.x, enemies[i].transform.position.y);
 
-                    if(Vector2.Distance(thisObject, enemyLocation) < shortestDistance)
+                    if(Vector2.Distance(this.transform.position, enemies[i].position) < shortestDistance)
                     {
-                        shortestDistance = Vector2.Distance(thisObject, enemyLocation);
+                        shortestDistance = Vector2.Distance(this.transform.position, enemies[i].position);
                         currentTarget = enemies[i];
                     }
                 }
@@ -110,10 +127,12 @@ public class EnemyController : MonoBehaviour
     public void GetMindControlled()
     {
         characterAllegiance = CharacterAllegiance.TempFriendly;
+        target = null;
     }
 
     public void RevertMindControl()
     {
         characterAllegiance = CharacterAllegiance.Hostile;
+        target = null;
     }
 }

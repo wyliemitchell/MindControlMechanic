@@ -30,7 +30,7 @@ public class CoroutineExample : MonoBehaviour
 
         time = 0;
 
-        while(time < 2.5f)
+        while(time < 2.5f) //As long as you do a yield return null, this while loop will end each frame and give an accurate increase of time for your timer
         {
             yield return null;
             time += Time.deltaTime;

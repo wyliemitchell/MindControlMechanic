@@ -16,11 +16,12 @@ public class PlayerController : MonoBehaviour
 {
     public bool isHiding = false;
     private bool isInHidingSpotArea = false;
-
+    
     public float moveSpeed = 1f;
     public float collisionOffset = 0.05f;
     public ContactFilter2D movementFilter;
     public SwordAttack swordAttack;
+    public float mindControlRange = 1f;
 
     public const CharacterAllegiance characterAllegiance = CharacterAllegiance.Player;
 
@@ -113,7 +114,7 @@ public class PlayerController : MonoBehaviour
 
             GetComponent<SpriteRenderer>().color = normalColor;
         }
-        Debug.Log("Is not hiding!");
+        //Debug.Log("Is not hiding!");
         isHiding = false;
     }
 
@@ -139,9 +140,9 @@ public class PlayerController : MonoBehaviour
 
     }
 
-        void OnMove(InputValue movementValue) {
-            movementInput = movementValue.Get<Vector2>();
-        }
+    void OnMove(InputValue movementValue) {
+        movementInput = movementValue.Get<Vector2>();
+    }
 
     void OnFire() {
         animator.SetTrigger("swordAttack");
@@ -190,11 +191,97 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void MindControlEnemy()
+    public void OnMindControl()
     {
+        Debug.Log("Getting Called?");
         //Do all the logic for mind controlling an enemy (probably an enum for a channel time, etc.)
+        Vector2 mcDir;
 
-        EnemyController enemyBeingMindControlled;
+        if (spriteRenderer.flipX == true)
+        {
+            mcDir = Vector2.left;
+        }
+        else
+        {
+            mcDir = Vector2.right;
+        }
+        /*
+        RaycastHit hit3D;
+
+        if(Physics.Raycast(this.transform.position, Vector3.right, out hit3D)) //3D Raycast!
+        {
+            if(hit3D.collider.tag == "Enemy")
+            {
+
+            }
+        }
+        */
+        /* //Raycast only does a line :( Feels bad if you miss
+        RaycastHit2D hit = Physics2D.Raycast(this.transform.position, mcDir, mindControlRange);
+
+        if(hit.collider != null)
+        {
+            Debug.Log(hit.transform.name);
+
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                Debug.Log("Enemy Hit!");
+            }
+        }
+        else
+        {
+            Debug.Log("Didn't Hit Anything");
+        }*/
+        Vector2 OppositeRectanglePoint = this.transform.position;
+
+        /* //Perfectly Proper to check left or right and assign values accordingly. OR...
+        if(mcDir == Vector2.right)
+        {
+            OppositeRectanglePoint += new Vector2(mindControlRange, -0.226f);
+        }
+        else if(mcDir == Vector2.left)
+        {
+            OppositeRectanglePoint += new Vector2(-mindControlRange, -0.226f);
+        }*/
+
+        OppositeRectanglePoint += new Vector2(mcDir == Vector2.left ? -mindControlRange : mindControlRange, -0.226f);
+
+
+        Collider2D[] hitColliders = Physics2D.OverlapAreaAll(this.transform.position, OppositeRectanglePoint);
+
+        List<Transform> enemies = new List<Transform>();
+
+        for (int i = 0; i < hitColliders.Length; i++)
+        {
+            if (hitColliders[i].CompareTag("Enemy"))
+            {
+                Transform enemy = hitColliders[i].transform;
+
+                enemies.Add(enemy);
+            }
+        }
+
+        float shortestDistance = mindControlRange + 1;
+        Transform currentTarget = null;
+        
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            if (Vector2.Distance(this.transform.position, enemies[i].position) < shortestDistance)
+            {
+                shortestDistance = Vector2.Distance(this.transform.position, enemies[i].position);
+                currentTarget = enemies[i];
+            }
+        }
+
+        /* if(currentTarget != null) //This is the same as...
+         {
+             Debug.Log(currentTarget.name);
+         }*/
+
+        Debug.Log("Current Target's Name is: " + currentTarget?.name); // The question mark asks if it's null. If it is null, it returns null. If it's not null, it gives the name.
+
+        //'currentTarget' now has the enemy we are targeting to be mind controlled! Use this to figure out how to change the
+        //values necessary on the EnemyController.
 
     }
 }
