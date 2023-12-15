@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
 {
     public bool isHiding = false;
     private bool isInHidingSpotArea = false;
-    
+
     public float moveSpeed = 1f;
     public float collisionOffset = 0.05f;
     public ContactFilter2D movementFilter;
@@ -51,30 +51,40 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void FixedUpdate() {
-        if (canMove) {
+    private void FixedUpdate()
+    {
+        if (canMove)
+        {
             // If movement input is not 0, try to move
-            if (movementInput != Vector2.zero){
+            if (movementInput != Vector2.zero)
+            {
 
                 bool success = TryMove(movementInput);
 
-                if (!success) {
+                if (!success)
+                {
                     success = TryMove(new Vector2(movementInput.x, 0));
                 }
 
-                if (!success) {
+                if (!success)
+                {
                     success = TryMove(new Vector2(0, movementInput.y));
                 }
 
                 animator.SetBool("isMoving", success);
-            } else {
+            }
+            else
+            {
                 animator.SetBool("isMoving", false);
             }
 
             // Set direction of sprite to movement direction
-            if (movementInput.x < 0) {
+            if (movementInput.x < 0)
+            {
                 spriteRenderer.flipX = true;
-            } else if (movementInput.x > 0) {
+            }
+            else if (movementInput.x > 0)
+            {
                 spriteRenderer.flipX = false;
             }
         }
@@ -84,22 +94,28 @@ public class PlayerController : MonoBehaviour
 
     private void CheckPlayerHidden()
     {
-        if (hideAction.IsPressed()) {
+        if (hideAction.IsPressed())
+        {
             Debug.Log("Pressing Hide");
-            if (isInHidingSpotArea) {
+            if (isInHidingSpotArea)
+            {
                 HidePlayer();
             }
-            else {
+            else
+            {
                 UnhidePlayer();
             }
         }
-        else {
+        else
+        {
             UnhidePlayer();
         }
     }
 
-    private void HidePlayer() {
-        if (isHiding == false) {
+    private void HidePlayer()
+    {
+        if (isHiding == false)
+        {
             Color hidingColor = new Color(1f, 1f, 1f, 0.5f);
 
             GetComponent<SpriteRenderer>().color = hidingColor;
@@ -108,8 +124,10 @@ public class PlayerController : MonoBehaviour
         isHiding = true;
     }
 
-    private void UnhidePlayer() {
-        if (isHiding == true) {
+    private void UnhidePlayer()
+    {
+        if (isHiding == true)
+        {
             Color normalColor = new Color(1f, 1f, 1f, 1f);
 
             GetComponent<SpriteRenderer>().color = normalColor;
@@ -118,8 +136,10 @@ public class PlayerController : MonoBehaviour
         isHiding = false;
     }
 
-    private bool TryMove(Vector2 direction) {
-        if (direction != Vector2.zero) {
+    private bool TryMove(Vector2 direction)
+    {
+        if (direction != Vector2.zero)
+        {
             // Check for potential collisions
             int count = rb.Cast(
                 direction, // X and Y values betwen -1 and 1 that represent the direction from the body to look for collisions
@@ -127,56 +147,73 @@ public class PlayerController : MonoBehaviour
                 castCollisions, // List of collisions to store the found collisions into after the Cast is finished
                 moveSpeed * Time.fixedDeltaTime + collisionOffset); // The amount to cast equal to the movement plus an offset
 
-            if (count == 0) {
+            if (count == 0)
+            {
                 rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
                 return true;
-            } else {
+            }
+            else
+            {
                 return false;
             }
-        } else {
+        }
+        else
+        {
             // Can't move if there's no direction to move in
             return false;
         }
 
     }
 
-    void OnMove(InputValue movementValue) {
+    void OnMove(InputValue movementValue)
+    {
         movementInput = movementValue.Get<Vector2>();
     }
 
-    void OnFire() {
+    void OnFire()
+    {
         animator.SetTrigger("swordAttack");
     }
 
-    public void SwordAttack() {
+    public void SwordAttack()
+    {
         LockMovement();
 
-        if (spriteRenderer.flipX == true){
+        if (spriteRenderer.flipX == true)
+        {
             swordAttack.AttackLeft();
-        } else {
+        }
+        else
+        {
             swordAttack.AttackRight();
         }
     }
 
-    public void EndSwordAttack() {
+    public void EndSwordAttack()
+    {
         UnlockMovement();
         swordAttack.StopAttack();
     }
 
-        public void LockMovement() {
+    public void LockMovement()
+    {
         canMove = false;
     }
 
-    public void UnlockMovement() {
+    public void UnlockMovement()
+    {
         canMove = true;
     }
 
-    public void OnTriggerEnter2D(Collider2D collision) {
-        if(collision.tag == "HidingSpot") {
-            isInHidingSpotArea = true;
-        } else if (collision.tag == "Enemy")
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "HidingSpot")
         {
-            if(isHiding == false)
+            isInHidingSpotArea = true;
+        }
+        else if (collision.tag == "Enemy")
+        {
+            if (isHiding == false)
             {
                 //Deal Damage to Player!
             }
@@ -185,7 +222,8 @@ public class PlayerController : MonoBehaviour
 
     public void OnTriggerExit2D(Collider2D collision)
     {
-        if(collision.tag == "HidingSpot") {
+        if (collision.tag == "HidingSpot")
+        {
             isInHidingSpotArea = false;
             UnhidePlayer();
         }
@@ -263,7 +301,7 @@ public class PlayerController : MonoBehaviour
 
         float shortestDistance = mindControlRange + 1;
         Transform currentTarget = null;
-        
+
         for (int i = 0; i < enemies.Count; i++)
         {
             if (Vector2.Distance(this.transform.position, enemies[i].position) < shortestDistance)
@@ -278,10 +316,23 @@ public class PlayerController : MonoBehaviour
              Debug.Log(currentTarget.name);
          }*/
 
-        Debug.Log("Current Target's Name is: " + currentTarget?.name); // The question mark asks if it's null. If it is null, it returns null. If it's not null, it gives the name.
+        Debug.Log("Current Target's Name is: " + currentTarget?.name);
 
-        //'currentTarget' now has the enemy we are targeting to be mind controlled! Use this to figure out how to change the
-        //values necessary on the EnemyController.
+        // WYLIE - Check if current target is an enemy with the EnemyController script
+        if (currentTarget != null && currentTarget.CompareTag("Enemy"))
+        {
+            EnemyController enemyController = currentTarget.GetComponent<EnemyController>();
 
+            if (enemyController != null)
+            {
+                // WYLIE - change the enemy's allegiance through the GetMindControlled function
+                enemyController.GetMindControlled();
+            }
+            else
+            {
+                // WYLIE - test to make sure it's hitting the intended target
+                Debug.LogWarning("Current Target does not have EnemyController script!");
+            }
+        }
     }
 }
