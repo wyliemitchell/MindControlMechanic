@@ -9,7 +9,7 @@ public class CoroutineExample : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(CountingUpTime());
+        //StartCoroutine(CountingUpTime());
     }
 
     // Update is called once per frame
@@ -19,14 +19,19 @@ public class CoroutineExample : MonoBehaviour
         {
             StopChanneling();
         }
+
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            StartCoroutine(CountingUpTime());
+        }
     }
 
     IEnumerator CountingUpTime()
     {
-        Debug.Log("Frame 1");
+        Debug.Log("Started Timer!");
         yield return null; //Ends code here, will continue next frame.
-        yield return new WaitForSeconds(2.5f); // Waits for set time before continuing the rest of the coroutine.
-        Debug.Log("Waited 2.5s from WaitForSeconds");
+        //yield return new WaitForSeconds(2.5f); // Waits for set time before continuing the rest of the coroutine.
+        //Debug.Log("Waited 2.5s from WaitForSeconds");
 
         time = 0;
 
@@ -42,13 +47,14 @@ public class CoroutineExample : MonoBehaviour
             }
         }
 
-        if(!breakChannel)
+        if(breakChannel == true)
         {
-            Debug.Log("Timer Finished!");
+            breakChannel = false;
         }
         else
         {
-            breakChannel = false;
+            Debug.Log("Timer Finished!");
+            //We can do whatever we wanted to do when the timer finished.
         }
     }
 

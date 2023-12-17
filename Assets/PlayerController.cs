@@ -33,6 +33,9 @@ public class PlayerController : MonoBehaviour
     Animator animator;
     List<RaycastHit2D> castCollisions = new List<RaycastHit2D>();
 
+    private bool hasMindControlledEnemy;
+    private EnemyController mindControlledEnemy;
+
     bool canMove = true;
 
     // Start is called before the first frame update
@@ -287,6 +290,8 @@ public class PlayerController : MonoBehaviour
 
         Collider2D[] hitColliders = Physics2D.OverlapAreaAll(this.transform.position, OppositeRectanglePoint);
 
+        //Change this list from a list of transforms to a list of EnemyControllers. Make sure the logic works for this function after changing the list.
+        //Once you've changed the list to a list of EnemyControllers, make sure you only allow enemies of a certain rank. (No bosses/minibosses!)
         List<Transform> enemies = new List<Transform>();
 
         for (int i = 0; i < hitColliders.Length; i++)
@@ -319,14 +324,18 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Current Target's Name is: " + currentTarget?.name);
 
         // WYLIE - Check if current target is an enemy with the EnemyController script
-        if (currentTarget != null && currentTarget.CompareTag("Enemy"))
+        if (currentTarget != null)
         {
             EnemyController enemyController = currentTarget.GetComponent<EnemyController>();
 
             if (enemyController != null)
             {
                 // WYLIE - change the enemy's allegiance through the GetMindControlled function
+                mindControlledEnemy = enemyController;
+                hasMindControlledEnemy = true;
+
                 enemyController.GetMindControlled();
+                StartCoroutine(MindControlTimer());
             }
             else
             {
@@ -334,5 +343,14 @@ public class PlayerController : MonoBehaviour
                 Debug.LogWarning("Current Target does not have EnemyController script!");
             }
         }
+    }
+
+    private IEnumerator MindControlTimer()
+    {
+        yield return null;
+        //Starts a timer based on the enemy type. When it expires, the enemy must have RevertMindControl called,
+        //and this script's mindControlledEnemy and hasMindControlledEnemy must be changed as well.
+        //Needs a check for if the player mind controls another enemy while this timer is still going. (Timer example is in CoroutineExample.cs)
+        //Do not use a debug key to break this timer - make sure it breaks at the correct time (when another enemy is mind controlled while this timer is still running)
     }
 }
